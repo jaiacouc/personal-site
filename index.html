@@ -1,69 +1,806 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="mobile-web-app-capable" content="yes" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="authorization_endpoint" href="https://indieauth.com/auth">
-  <link rel="token_endpoint" href="https://tokens.indieauth.com/token">
-  <!-- To use social readers via microsub, follow these steps.
-    (Details: https://indieweb.org/Microsub#Getting_Started)
-    1. After publishing this to your domain, sign in to https://aperture.p3k.io/login with your domain
-    2. You will see a <link> tag displayed on your dashboard that looks like:
-      <link rel="microsub" href="https://aperture.p3k.io/microsub/000">
-    3. Copy that <link> tag and paste it after this HTML comment.
-    4. Publish the updated page!
-   -->
-  <title>My New Website</title>
+  <title>John Doe — Full Stack Engineer</title>
+  <meta name="description" content="Full stack engineer building thoughtful software. Angular, TypeScript, NestJS, AWS.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@300;400&display=swap" rel="stylesheet">
   <style>
-    @media (prefers-color-scheme: dark) {
-      html { background-color: #111111; color: #fbfbfb; }
-      a { color: #ca8465; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0D0F14;
+      --surface:     #13151D;
+      --surface-2:   #1A1D28;
+      --text:        #E2E5F0;
+      --text-soft:   #9BA3C0;
+      --muted:       #525878;
+      --accent:      #6B9FFF;
+      --accent-soft: rgba(107,159,255,0.10);
+      --accent-glow: rgba(107,159,255,0.05);
+      --border:      rgba(226,229,240,0.07);
+      --border-mid:  rgba(226,229,240,0.12);
+      --serif: 'Syne', system-ui, sans-serif;
+      --sans:  'Plus Jakarta Sans', system-ui, sans-serif;
+      --mono:  'IBM Plex Mono', monospace;
     }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      line-height: 1.6;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-      text-align: center;
-      margin: 1rem auto;
-      min-height: 90vh;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle noise + grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(107,159,255,0.06) 0%, transparent 55%),
+        radial-gradient(circle, rgba(226,229,240,0.025) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.1rem 3rem;
+      background: rgba(13,15,20,0.82);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.4s;
+    }
+
+    nav.scrolled { border-color: var(--border); }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      text-decoration: none;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.25rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 400;
+      text-decoration: none;
+      color: var(--muted);
+      transition: color 0.2s;
+      letter-spacing: 0.01em;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    section { padding: 7rem 0; }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 3.5rem;
+    }
+
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 1px;
+      background: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* ── Hero ── */
+    #hero { padding-top: 14rem; padding-bottom: 7rem; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--accent);
+      border: 1px solid rgba(107,159,255,0.22);
+      background: var(--accent-soft);
+      padding: 0.35rem 0.85rem;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+      letter-spacing: 0.04em;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .hero-name {
+      font-family: var(--serif);
+      font-size: clamp(4rem, 9.5vw, 7rem);
+      font-weight: 600;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 2rem;
+      color: var(--text);
+    }
+
+    .hero-name span {
+      color: var(--accent);
+      font-weight: 300;
+    }
+
+    .hero-tagline {
+      font-size: 1.05rem;
+      color: var(--text-soft);
+      max-width: 460px;
+      line-height: 1.85;
+      margin-bottom: 3rem;
+      font-weight: 300;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--bg);
+      background: var(--accent);
+      padding: 0.7rem 1.4rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity 0.2s;
+      letter-spacing: 0.01em;
+    }
+
+    .btn-primary:hover { opacity: 0.88; }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--text-soft);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .btn-secondary:hover { color: var(--text); }
+
+    /* ── About ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .about-text h2 {
+      font-family: var(--serif);
+      font-size: 2.4rem;
+      font-weight: 500;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .about-text p {
+      color: var(--text-soft);
+      font-size: 0.95rem;
+      margin-bottom: 1.1rem;
+      font-weight: 300;
+      line-height: 1.85;
+    }
+
+    .about-details {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .detail-item {
+      padding: 0.85rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 1rem;
+      align-items: baseline;
+    }
+
+    .detail-item:last-child { border-bottom: none; }
+
+    .detail-label {
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .detail-value {
+      font-size: 0.84rem;
+      color: var(--text-soft);
+      font-weight: 400;
+    }
+
+    /* ── Experience ── */
+    .exp-item {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 3rem;
+      padding: 2.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .exp-item:first-of-type { border-top: 1px solid var(--border); }
+
+    .exp-date {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      padding-top: 0.4rem;
+      letter-spacing: 0.04em;
+    }
+
+    .exp-role {
+      font-family: var(--serif);
+      font-size: 1.3rem;
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .exp-company {
+      font-size: 0.8rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      font-weight: 400;
+    }
+
+    .exp-desc {
+      font-size: 0.9rem;
+      color: var(--text-soft);
+      font-weight: 300;
+      line-height: 1.8;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 1.25rem;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      padding: 0.25rem 0.65rem;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--surface);
+      border-radius: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── Projects ── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .project-card {
+      padding: 2rem;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.25s, background 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .project-card:hover {
+      border-color: var(--border-mid);
+      background: var(--surface-2);
+    }
+
+    .project-card:hover::before { opacity: 1; }
+
+    .project-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--mono);
+      font-size: 0.62rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid rgba(107,159,255,0.18);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      margin-bottom: 1.1rem;
+    }
+
+    .project-card h3 {
+      font-family: var(--serif);
+      font-size: 1.45rem;
+      font-weight: 500;
+      margin-bottom: 0.65rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .project-card p {
+      font-size: 0.88rem;
+      color: var(--text-soft);
+      font-weight: 300;
+      line-height: 1.75;
+    }
+
+    .project-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .project-arrow {
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+
+    .project-card:hover .project-arrow { color: var(--accent); }
+
+    /* ── Blog ── */
+    .post-item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 2rem;
+      align-items: center;
+      padding: 1.75rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .post-item:first-of-type { border-top: 1px solid var(--border); }
+
+    .post-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.45rem;
+    }
+
+    .post-date {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .post-tag {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 3px;
+    }
+
+    .post-title {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      transition: color 0.2s;
+    }
+
+    .post-item:hover .post-title { color: var(--accent); }
+
+    .post-excerpt {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .post-arrow {
+      font-size: 1rem;
+      color: var(--border-mid);
+      transition: color 0.2s, transform 0.2s;
+    }
+
+    .post-item:hover .post-arrow { color: var(--accent); transform: translateX(3px); }
+
+    /* ── Contact ── */
+    #contact { padding-top: 7rem; }
+
+    .contact-heading {
+      font-family: var(--serif);
+      font-size: clamp(2.6rem, 5.5vw, 4.5rem);
+      font-weight: 500;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      max-width: 580px;
+      color: var(--text);
+      letter-spacing: -0.025em;
+    }
+
+    .contact-sub {
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      font-weight: 300;
+      margin-bottom: 3rem;
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--border);
+    }
+
+    .contact-link {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      gap: 0.4rem;
+      padding: 1.5rem;
+      text-decoration: none;
+      background: var(--surface);
+      transition: background 0.2s;
     }
-    img.u-photo { border-radius: 50%; }
-    ul { padding: 0; list-style: none; }
+
+    .contact-link:hover { background: var(--surface-2); }
+
+    .contact-link-label {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .contact-link-value {
+      font-size: 0.88rem;
+      color: var(--text-soft);
+      transition: color 0.2s;
+    }
+
+    .contact-link:hover .contact-link-value { color: var(--accent); }
+
+    /* ── Footer ── */
+    footer {
+      padding: 2rem 2rem 4.5rem;
+      max-width: 860px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 0.67rem;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ── Load animation ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in { opacity: 0; animation: fadeUp 0.65s ease forwards; }
+    .fade-in:nth-child(1) { animation-delay: 0.05s; }
+    .fade-in:nth-child(2) { animation-delay: 0.18s; }
+    .fade-in:nth-child(3) { animation-delay: 0.30s; }
+    .fade-in:nth-child(4) { animation-delay: 0.42s; }
+
+    /* ── Responsive ── */
+    @media (max-width: 720px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .container { padding: 0 1.5rem; }
+      section { padding: 5rem 0; }
+      #hero { padding-top: 9rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .post-item { grid-template-columns: 1fr; }
+      .post-arrow { display: none; }
+      .contact-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+    }
   </style>
 </head>
-
 <body>
-  <!-- Reference for representative h-card properties: https://microformats.org/wiki/h-card -->
-  <main class="h-card" rel="author">
-    <!-- Uncomment and add __your_image__ to display a photo!
-      <img class="u-photo" alt="My profile photo" src="__your_image__" />
-    -->
-    <h1>
-      I'm <span class="p-name">Jane Smith</span>.
-    </h1>
 
-    <p class="p-note">
-      ...and I am a human on the Internet.
-    </p>
-
-    <ul>
-      <!-- Replace __this_page__ with your domain -->
-      <li><a class="u-uid u-url" href="__this_page__">My New Website</a></li>
-
-      <!-- Update or remove the below links! -->
-      
-      <!-- Replace _mygithubid_ with your GitHub username in both places on the next line: -->
-      <li>Github: <a class="u-url" href="https://github.com/_mygithubid_" rel="me">@_mygithubid_</a></li>
-
-      <!-- Replace _mytwitterid_ with your Twitter username in both places on the next line: -->
-      <li>Twitter: <a class="u-url" href="https://twitter.com/_mytwitterid_" rel="me">@_mytwitterid_</a></li>
-      
+  <nav id="navbar">
+    <a href="#hero" class="nav-logo">john.doe</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#experience">Work</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#blog">Writing</a></li>
+      <li><a href="#contact">Contact</a></li>
     </ul>
-  </main>
-</body>
+  </nav>
 
+  <!-- Hero -->
+  <section id="hero">
+    <div class="container">
+      <div class="hero-badge fade-in">Available for interesting conversations</div>
+      <h1 class="hero-name fade-in">John<br><span>Doe.</span></h1>
+      <p class="hero-tagline fade-in">Full stack engineer building thoughtful software for healthcare. Angular · TypeScript · NestJS · AWS. Also training for a 50K in the mountains.</p>
+      <div class="hero-actions fade-in">
+        <a href="#contact" class="btn-primary">Get in touch →</a>
+        <a href="#projects" class="btn-secondary">See my work</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="container">
+      <p class="section-label">About</p>
+      <div class="about-grid">
+        <div class="about-text">
+          <h2>Building things that actually matter.</h2>
+          <p>Full stack engineer with a focus on Angular, TypeScript, NestJS, and AWS. I care about clean architecture, thoughtful abstractions, and software that earns its complexity.</p>
+          <p>I live in a terminal — Neovim, zsh, iTerm2. Outside of code, I spend a lot of time on trails. Currently training for the Ridge to Rails 50K. 31 miles, serious elevation gain. It has a way of putting things in perspective.</p>
+        </div>
+        <div class="about-details">
+          <div class="detail-item">
+            <span class="detail-label">Now</span>
+            <span class="detail-value">Trend Health Partners</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Stack</span>
+            <span class="detail-value">Angular · TS · NestJS · AWS</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Editor</span>
+            <span class="detail-value">Neovim + iTerm2</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Location</span>
+            <span class="detail-value">North Carolina</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Training</span>
+            <span class="detail-value">Ridge to Rails 50K · June 2026</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience -->
+  <section id="experience">
+    <div class="container">
+      <p class="section-label">Work Experience</p>
+
+      <div class="exp-item">
+        <span class="exp-date">2026 — now</span>
+        <div>
+          <div class="exp-role">Full Stack Engineer</div>
+          <div class="exp-company">Trend Health Partners</div>
+          <p class="exp-desc">Building healthcare software with Angular, NestJS, and AWS. Working across the full stack on features that impact patient and provider workflows in a mission-driven environment.</p>
+          <div class="tags">
+            <span class="tag">Angular</span>
+            <span class="tag">TypeScript</span>
+            <span class="tag">NestJS</span>
+            <span class="tag">AWS CDK</span>
+            <span class="tag">DynamoDB</span>
+            <span class="tag">Lambda</span>
+            <span class="tag">Cognito</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <span class="exp-date">20XX — 2026</span>
+        <div>
+          <div class="exp-role">Full Stack Engineer</div>
+          <div class="exp-company">Extron Electronics</div>
+          <p class="exp-desc">Developed and maintained web applications for AV control system configuration. Worked in agile/scrum environments on Angular-based interfaces backed by REST APIs, with a focus on reliability and UX.</p>
+          <div class="tags">
+            <span class="tag">Angular</span>
+            <span class="tag">TypeScript</span>
+            <span class="tag">REST APIs</span>
+            <span class="tag">Agile/Scrum</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects">
+    <div class="container">
+      <p class="section-label">Projects</p>
+      <div class="projects-grid">
+
+        <a href="#" class="project-card">
+          <div class="project-status">Active</div>
+          <h3>PickupFC</h3>
+          <p>A pickup sports app built around real-world connection. Find and join games near you — no algorithms, no ads, just people who want to play.</p>
+          <div class="project-footer">
+            <div class="tags">
+              <span class="tag">Angular</span>
+              <span class="tag">NestJS</span>
+              <span class="tag">AWS</span>
+            </div>
+            <span class="project-arrow">→</span>
+          </div>
+        </a>
+
+        <a href="#" class="project-card">
+          <div class="project-status">Open Source</div>
+          <h3>Shared Config</h3>
+          <p>Reusable TypeScript, ESLint, and Jest configurations for monorepos. Independent publishing with Changesets — drop it in and move on.</p>
+          <div class="project-footer">
+            <div class="tags">
+              <span class="tag">TypeScript</span>
+              <span class="tag">ESLint</span>
+              <span class="tag">Changesets</span>
+            </div>
+            <span class="project-arrow">→</span>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Blog -->
+  <section id="blog">
+    <div class="container">
+      <p class="section-label">Writing</p>
+
+      <a href="#" class="post-item">
+        <div>
+          <div class="post-meta">
+            <span class="post-date">coming soon</span>
+            <span class="post-tag">tooling</span>
+          </div>
+          <div class="post-title">Why I switched to a terminal-first dev workflow</div>
+          <div class="post-excerpt">From VS Code to Neovim — what I learned about friction, focus, and intentionality.</div>
+        </div>
+        <span class="post-arrow">→</span>
+      </a>
+
+      <a href="#" class="post-item">
+        <div>
+          <div class="post-meta">
+            <span class="post-date">coming soon</span>
+            <span class="post-tag">running</span>
+          </div>
+          <div class="post-title">Training for my first 50K: what running long teaches you</div>
+          <div class="post-excerpt">Ridge to Rails is 31 miles with serious vert. Here's what I keep learning along the way.</div>
+        </div>
+        <span class="post-arrow">→</span>
+      </a>
+
+      <a href="#" class="post-item">
+        <div>
+          <div class="post-meta">
+            <span class="post-date">coming soon</span>
+            <span class="post-tag">engineering</span>
+          </div>
+          <div class="post-title">NestJS to Spring Boot: a practical translation guide</div>
+          <div class="post-excerpt">Coming from a NestJS background? Here's how the patterns map — and where they diverge.</div>
+        </div>
+        <span class="post-arrow">→</span>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact">
+    <div class="container">
+      <p class="section-label">Contact</p>
+      <h2 class="contact-heading">Let's build something worth building.</h2>
+      <p class="contact-sub">I'm always open to interesting projects and conversations.</p>
+      <div class="contact-grid">
+        <a href="mailto:john@yourdomain.com" class="contact-link">
+          <span class="contact-link-label">Email</span>
+          <span class="contact-link-value">john@yourdomain.com</span>
+        </a>
+        <a href="https://github.com/yourusername" target="_blank" rel="noopener" class="contact-link">
+          <span class="contact-link-label">GitHub</span>
+          <span class="contact-link-value">github.com/yourusername</span>
+        </a>
+        <a href="https://linkedin.com/in/yourusername" target="_blank" rel="noopener" class="contact-link">
+          <span class="contact-link-label">LinkedIn</span>
+          <span class="contact-link-value">linkedin.com/in/yourusername</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>© 2026 John Doe</span>
+    <span>Built with care · Hosted on GitHub Pages</span>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 20);
+    }, { passive: true });
+  </script>
+
+</body>
 </html>
